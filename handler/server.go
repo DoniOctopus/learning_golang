@@ -19,6 +19,7 @@ func (s *server) Run() {
 	s.srv.Use(LoggerMiddleware())
 	NewServiceHandler(s.srv, s.usecaseManager.GetServiceUsecase())
 	NewUserHandler(s.srv, s.usecaseManager.GetUserUsecase())
+	NewLoginHandler(s.srv, s.usecaseManager.GetLoginUsecase())
 
 	s.srv.Run()
 }

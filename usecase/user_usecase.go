@@ -11,6 +11,7 @@ type UserUsecase interface {
 	// GetUserById(int) (*model.UserModel, error)
 	InsertUser(*model.UserModel) error
 	GetUserByName(string) (*model.UserModel, error)
+	
 }
 
 type userUsecaseImpl struct {
