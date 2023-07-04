@@ -3,6 +3,7 @@ package handler
 import (
 	"goclean/usecase"
 	"goclean/utils/authutil"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,9 +16,7 @@ type LoginHandler struct {
 func (loginHandler LoginHandler) login(lg *gin.Context){
 	temp,err := authutil.GenerateToken("doni")
 	if err != nil {
-		lg.JSON(http.StatusOK, gin.H{
-			"err": err.Error(),
-		})	
+		log.Println("Token Invalid")
 	}
 	lg.JSON(http.StatusOK, gin.H{
         "token": temp,
@@ -31,4 +30,8 @@ func NewLoginHandler(lg *gin.Engine, loginusecase usecase.LoginUsecase){
 		loginUsecase: loginusecase ,
 	}
 		lg.POST("/login", LoginHandler.login)
+}
+
+func LoginUser(){
+	
 }

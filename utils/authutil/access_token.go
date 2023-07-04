@@ -11,7 +11,8 @@ const KEY = "asd12easd"
 
 type JwtClaims struct {
 	jwt.StandardClaims
-	Username string `json:"Username"`
+	Username        string `json:"Username"`
+	ApplicationName string
 }
 
 func GenerateToken(userName string) (string, error) {
@@ -33,6 +34,16 @@ func GenerateToken(userName string) (string, error) {
 	return token, nil
 }
 
-func ValidateToken() {
-
+func VerifyAccessToken(tokenString string) (string, error) {
+	claim := &JwtClaims{}
+	t, err := jwt.ParseWithClaims(tokenString, claim, func(t *jwt.Token) (interface{}, error) {
+		return []byte(KEY), nil
+	})
+	if err != nil {
+		return "", fmt.Errorf("VerifyAccessToken : %w", err)
+	}
+	if !t.Valid {
+		return "", fmt.Errorf("VerifyAccessToken : invalid token")
+	}
+	return claim.Username, nil
 }

@@ -99,7 +99,7 @@ func NewServiceHandler(srv *gin.Engine, svcUsecase usecase.ServiceUsecase) *Serv
 	svcHandler := &ServiceHandler{
 		svcUsecase: svcUsecase,
 	}
-	srv.GET("/service/:id", svcHandler.GetServiceById)
+	srv.GET("/service/:id", RequireToken(),svcHandler.GetServiceById)
 	srv.POST("/service", svcHandler.InsertService)
 	return svcHandler
 }
