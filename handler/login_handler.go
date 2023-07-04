@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"goclean/model"
 	"goclean/usecase"
 	"goclean/utils/authutil"
 	"log"
@@ -10,28 +11,46 @@ import (
 )
 
 type LoginHandler struct {
-	loginUsecase usecase.LoginUsecase
+	userUc usecase.UserUsecase
 }
 
-func (loginHandler LoginHandler) login(lg *gin.Context){
-	temp,err := authutil.GenerateToken("doni")
+func (l LoginHandler) login(ctx *gin.Context) {
+	loginUserName := &model.LoginModel{}
+	err := ctx.ShouldBindJSON(&loginUserName)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success":      false,
+			"errorMessage": "Invalid JSON data",
+		})
+		return
+	}
+	usr, errGetName := l.userUc.GetUserByName(loginUserName.Username)
+	if usr == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success":      false,
+			"errorMessage": "Name is Invalid",
+		})
+		return
+	}
+	if errGetName != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success":      false,
+			"errorMessage": err.Error(),
+		})
+		return
+	}
+	temp, err := authutil.GenerateToken(loginUserName.Username)
 	if err != nil {
 		log.Println("Token Invalid")
 	}
-	lg.JSON(http.StatusOK, gin.H{
-        "token": temp,
-    })
+	ctx.JSON(http.StatusOK, gin.H{
+		"token": temp,
+	})
 }
 
-
-
-func NewLoginHandler(lg *gin.Engine, loginusecase usecase.LoginUsecase){
+func NewLoginHandler(lg *gin.Engine, loginusecase usecase.UserUsecase) {
 	LoginHandler := &LoginHandler{
-		loginUsecase: loginusecase ,
+		userUc: loginusecase,
 	}
-		lg.POST("/login", LoginHandler.login)
-}
-
-func LoginUser(){
-	
+	lg.POST("/login", LoginHandler.login)
 }

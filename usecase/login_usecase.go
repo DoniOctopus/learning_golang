@@ -3,6 +3,7 @@ package usecase
 import "goclean/repo"
 
 type LoginUsecase interface {
+	
 }
 
 type loginUsecase struct {
