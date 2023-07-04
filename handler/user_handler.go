@@ -59,10 +59,38 @@ func (usrHandler UserHandler) InsertUser(ctx *gin.Context) {
 
 }
 
+func (usrHandler UserHandler) GetUserByName(ctx *gin.Context) {
+	name := ctx.Param("name")
+	if name == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success":      false,
+			"errorMessage": "Nama tidak boleh kosong",
+		})
+		return
+	}
+
+	usr, err := usrHandler.usrUsecase.GetUserByName(name)
+	if err != nil {
+		fmt.Printf("UserHandler.GetUserByName() : %v ", err.Error())
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"success":      false,
+			"errorMessage": "Terjadi kesalahan ketika mengambil data User",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"data":    usr,
+	})
+}
+
+
 func NewUserHandler(srv *gin.Engine, usrUsecase usecase.UserUsecase) *UserHandler {
 	usrHandler := &UserHandler{
 		usrUsecase: usrUsecase,
 	}
 	srv.POST("/User", usrHandler.InsertUser)
+	srv.GET("/User/:name", usrHandler.GetUserByName)
 	return usrHandler
 }
